@@ -1,0 +1,48 @@
+name: instagram-direct-bot
+
+services:
+  database:
+    image: postgres:17.6-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: instagram_direct
+      POSTGRES_USER: instagram_direct
+      POSTGRES_PASSWORD: instagram_direct
+    ports:
+      - 127.0.0.1:5434:5432
+    volumes:
+      - instagram-direct-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U instagram_direct -d instagram_direct]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  bot:
+    build:
+      context: .
+      target: runtime
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql://instagram_direct:instagram_direct@database:5432/instagram_direct
+    ports:
+      - 127.0.0.1:${HTTP_PORT:-8091}:${HTTP_PORT:-8091}
+    depends_on:
+      database:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+
+  checks:
+    profiles: [tools]
+    build:
+      context: .
+      target: checks
+    command: [npm, test]
+
+volumes:
+  instagram-direct-data:

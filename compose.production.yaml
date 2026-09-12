@@ -1,0 +1,43 @@
+name: instagram-direct-bot
+
+services:
+  bot:
+    image: ${BOT_IMAGE:-ghcr.io/evgenykravchenko/instagram-direct-bot}:${BOT_VERSION:?BOT_VERSION must be a SemVer release such as 0.1.0}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      INSTAGRAM_ACCESS_TOKEN: ${INSTAGRAM_ACCESS_TOKEN:?INSTAGRAM_ACCESS_TOKEN is required}
+      INSTAGRAM_ACCOUNT_ID: ${INSTAGRAM_ACCOUNT_ID:?INSTAGRAM_ACCOUNT_ID is required}
+      INSTAGRAM_APP_SECRET: ${INSTAGRAM_APP_SECRET:?INSTAGRAM_APP_SECRET is required}
+      INSTAGRAM_VERIFY_TOKEN: ${INSTAGRAM_VERIFY_TOKEN:?INSTAGRAM_VERIFY_TOKEN is required}
+      META_GRAPH_VERSION: ${META_GRAPH_VERSION:-v23.0}
+      CONTENT_BOT_KEY: ${CONTENT_BOT_KEY:-instagram-direct-bot}
+      DIRECTUS_URL: ${DIRECTUS_URL:-http://directus:8055}
+      DIRECTUS_TOKEN: ${DIRECTUS_TOKEN:?DIRECTUS_TOKEN is required}
+      CONTENT_CACHE_TTL_SECONDS: ${CONTENT_CACHE_TTL_SECONDS:-60}
+      YANDEX_DISK_TOKEN: ${YANDEX_DISK_TOKEN:?YANDEX_DISK_TOKEN is required}
+      MEDIA_POLL_INTERVAL_SECONDS: ${MEDIA_POLL_INTERVAL_SECONDS:-20}
+      MEDIA_BATCH_SIZE: ${MEDIA_BATCH_SIZE:-3}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      DATABASE_SSL: ${DATABASE_SSL:-false}
+      EVENT_POLL_INTERVAL_MS: ${EVENT_POLL_INTERVAL_MS:-500}
+      EVENT_MAX_ATTEMPTS: ${EVENT_MAX_ATTEMPTS:-8}
+      EVENT_LOCK_TIMEOUT_SECONDS: ${EVENT_LOCK_TIMEOUT_SECONDS:-300}
+      HTTP_HOST: 0.0.0.0
+      HTTP_PORT: ${HTTP_PORT:-8091}
+      WEBHOOK_PATH: ${WEBHOOK_PATH:-/webhook}
+      WEBHOOK_BODY_LIMIT_BYTES: ${WEBHOOK_BODY_LIMIT_BYTES:-1048576}
+    networks: [egress, platform]
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+
+networks:
+  egress:
+    driver: bridge
+  platform:
+    name: bot_platform_backend
+    external: true
