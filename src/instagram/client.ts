@@ -36,7 +36,7 @@ export class InstagramClient {
   async send(recipientId: string, message: OutboundMessage): Promise<void> {
     switch (message.type) {
       case 'text':
-        await this.sendPayload(recipientId, { text: message.text });
+        await this.sendText(recipientId, message.text);
         return;
       case 'media':
         await this.sendPayload(recipientId, {
@@ -45,7 +45,7 @@ export class InstagramClient {
             payload: { attachment_id: message.attachmentId },
           },
         });
-        if (message.caption) await this.sendPayload(recipientId, { text: message.caption });
+        if (message.caption) await this.sendText(recipientId, message.caption);
         return;
       case 'buttons':
         await this.sendPayload(recipientId, {
@@ -62,6 +62,12 @@ export class InstagramClient {
             },
           },
         });
+    }
+  }
+
+  private async sendText(recipientId: string, text: string): Promise<void> {
+    for (const part of splitText(text, 1_000)) {
+      await this.sendPayload(recipientId, { text: part });
     }
   }
 
@@ -129,4 +135,19 @@ export class InstagramClient {
 
 function mediaType(kind: MediaKind): string {
   return kind === 'photo' ? 'image' : kind;
+}
+
+function splitText(text: string, limit: number): string[] {
+  const result: string[] = [];
+  let remaining = text.trim();
+  while (remaining.length > limit) {
+    const preferredBreak = remaining.lastIndexOf('\n', limit);
+    const spaceBreak = remaining.lastIndexOf(' ', limit);
+    const candidate = Math.max(preferredBreak, spaceBreak);
+    const splitAt = candidate > 0 ? candidate : limit;
+    result.push(remaining.slice(0, splitAt).trim());
+    remaining = remaining.slice(splitAt).trim();
+  }
+  if (remaining) result.push(remaining);
+  return result;
 }

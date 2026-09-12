@@ -50,6 +50,22 @@ describe('InstagramClient', () => {
     );
   });
 
+  it('splits long text into accepted message sizes', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify({ message_id: 'm1' }), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await client().send('42', { type: 'text', text: 'a'.repeat(2_100) });
+
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    for (const call of fetchMock.mock.calls) {
+      const init = call[1] as RequestInit;
+      const body = JSON.parse(init.body as string) as { message: { text: string } };
+      expect(body.message.text.length).toBeLessThanOrEqual(1_000);
+    }
+  });
+
   it('marks rate limits as retryable without leaking tokens', async () => {
     vi.stubGlobal(
       'fetch',

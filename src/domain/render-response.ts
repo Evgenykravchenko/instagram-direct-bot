@@ -41,7 +41,12 @@ export function renderResponse(response: ManagedResponse): OutboundMessage[] {
   }
 
   const buttons = response.buttons
-    .filter((button) => button.label.trim() && button.target.trim())
+    .filter(
+      (button) =>
+        button.label.trim() &&
+        button.target.trim() &&
+        (button.action === 'text' || isHttpUrl(button.target)),
+    )
     .sort((left, right) => left.row - right.row || left.sort - right.sort)
     .map((button) =>
       button.action === 'open_link'
@@ -53,7 +58,7 @@ export function renderResponse(response: ManagedResponse): OutboundMessage[] {
         : ({
             type: 'postback' as const,
             title: shorten(button.label),
-            payload: button.target,
+            payload: button.target.slice(0, 1_000),
           } satisfies Extract<OutboundMessage, { type: 'buttons' }>['buttons'][number]),
     );
 
@@ -71,4 +76,13 @@ export function renderResponse(response: ManagedResponse): OutboundMessage[] {
 function shorten(value: string): string {
   const label = value.trim();
   return label.length <= BUTTON_TITLE_LIMIT ? label : `${label.slice(0, BUTTON_TITLE_LIMIT - 1)}…`;
+}
+
+function isHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' || url.protocol === 'http:';
+  } catch {
+    return false;
+  }
 }

@@ -45,4 +45,22 @@ describe('renderResponse', () => {
     });
     expect(messages).toEqual([{ type: 'text', text: 'Резервный текст' }]);
   });
+
+  it('drops unsafe link buttons', () => {
+    const messages = renderResponse({
+      id: 3,
+      fallbackText: 'Текст',
+      blocks: [],
+      buttons: [
+        {
+          label: 'Опасная ссылка',
+          action: 'open_link',
+          target: 'javascript:alert(1)',
+          row: 1,
+          sort: 1,
+        },
+      ],
+    });
+    expect(messages).toEqual([{ type: 'text', text: 'Текст' }]);
+  });
 });
