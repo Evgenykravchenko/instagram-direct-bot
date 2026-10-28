@@ -3,8 +3,8 @@ import type { Logger } from './config/logger.js';
 import { WebhookServer } from './http/server.js';
 import { InstagramClient } from './instagram/client.js';
 import { PostgresEventRepository } from './repositories/postgres.js';
+import { BotCrmContentClient } from './services/botcrm-content-client.js';
 import { ContentService } from './services/content-service.js';
-import { DirectusClient } from './services/directus-client.js';
 import { EventWorker } from './services/event-worker.js';
 import { MediaWorker } from './services/media-worker.js';
 import { YandexDiskClient } from './services/yandex-disk-client.js';
@@ -17,19 +17,14 @@ export class Application {
 
   constructor(config: AppConfig, logger: Logger) {
     this.repository = new PostgresEventRepository(config.DATABASE_URL, config.DATABASE_SSL, logger);
-    const directus = new DirectusClient(
-      config.DIRECTUS_URL,
-      config.DIRECTUS_TOKEN,
-      config.CONTENT_BOT_KEY,
-      logger,
-    );
+    const contentClient = new BotCrmContentClient(config.BOTCRM_URL, config.BOTCRM_CONTENT_TOKEN, logger);
     const instagram = new InstagramClient(
       config.META_GRAPH_VERSION,
       config.INSTAGRAM_ACCOUNT_ID,
       config.INSTAGRAM_ACCESS_TOKEN,
       logger,
     );
-    const content = new ContentService(directus, config.CONTENT_CACHE_TTL_SECONDS * 1_000, logger);
+    const content = new ContentService(contentClient, config.CONTENT_CACHE_TTL_SECONDS * 1_000, logger);
     this.eventWorker = new EventWorker(
       this.repository,
       content,
@@ -40,7 +35,7 @@ export class Application {
       logger,
     );
     this.mediaWorker = new MediaWorker(
-      directus,
+      contentClient,
       new YandexDiskClient(config.YANDEX_DISK_TOKEN),
       instagram,
       config.MEDIA_BATCH_SIZE,

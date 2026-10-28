@@ -7,7 +7,7 @@ const valid = {
   INSTAGRAM_ACCOUNT_ID: '123456789',
   INSTAGRAM_APP_SECRET: 's'.repeat(20),
   INSTAGRAM_VERIFY_TOKEN: 'v'.repeat(20),
-  DIRECTUS_TOKEN: 'd'.repeat(24),
+  BOTCRM_CONTENT_TOKEN: `bcr_${'c'.repeat(43)}`,
   YANDEX_DISK_TOKEN: 'y'.repeat(24),
   DATABASE_URL: 'postgresql://user:password@localhost:5434/database',
 };
@@ -15,7 +15,7 @@ const valid = {
 describe('loadConfig', () => {
   it('applies safe defaults', () => {
     const config = loadConfig(valid);
-    expect(config.CONTENT_BOT_KEY).toBe('instagram-direct-bot');
+    expect(config.BOTCRM_URL).toBe('http://localhost:4100/api/v1');
     expect(config.WEBHOOK_PATH).toBe('/webhook');
     expect(config.DATABASE_SSL).toBe(false);
   });

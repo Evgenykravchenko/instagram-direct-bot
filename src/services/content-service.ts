@@ -2,7 +2,7 @@ import type { Logger } from '../config/logger.js';
 import { findMatchingRule } from '../domain/matcher.js';
 import { renderResponse } from '../domain/render-response.js';
 import type { KeywordRule, OutboundMessage } from '../domain/types.js';
-import type { DirectusClient } from './directus-client.js';
+import type { BotCrmContentClient } from './botcrm-content-client.js';
 
 interface CacheState {
   rules: KeywordRule[];
@@ -15,7 +15,7 @@ export class ContentService {
   private cache: CacheState | null = null;
 
   constructor(
-    private readonly directus: DirectusClient,
+    private readonly contentClient: BotCrmContentClient,
     private readonly ttlMs: number,
     private readonly logger: Logger,
   ) {}
@@ -27,7 +27,7 @@ export class ContentService {
     if (!responseId)
       return cache.unknownMessage.trim() ? [{ type: 'text', text: cache.unknownMessage }] : [];
 
-    const response = await this.directus.getResponse(responseId);
+    const response = await this.contentClient.getResponse(responseId);
     if (!response) {
       this.logger.warn({ responseId }, 'Published response is unavailable');
       return cache.unknownMessage.trim() ? [{ type: 'text', text: cache.unknownMessage }] : [];
@@ -44,15 +44,15 @@ export class ContentService {
     if (this.cache && this.cache.expiresAt > Date.now()) return this.cache;
     try {
       const [rules, settings] = await Promise.all([
-        this.directus.getRules(),
-        this.directus.getSettings(),
+        this.contentClient.getRules(),
+        this.contentClient.getSettings(),
       ]);
       this.cache = { ...settings, rules, expiresAt: Date.now() + this.ttlMs };
       this.logger.debug({ count: rules.length }, 'Keyword rules cache refreshed');
       return this.cache;
     } catch (error) {
       if (this.cache) {
-        this.logger.warn({ err: error }, 'Directus unavailable; using stale content cache');
+        this.logger.warn({ err: error }, 'BotCRM content API unavailable; using stale content cache');
         return this.cache;
       }
       throw error;

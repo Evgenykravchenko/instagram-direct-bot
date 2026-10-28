@@ -26,6 +26,9 @@ services:
     env_file: [.env]
     environment:
       DATABASE_URL: postgresql://instagram_direct:instagram_direct@database:5432/instagram_direct
+      BOTCRM_URL: ${BOTCRM_URL:-http://host.docker.internal:4100/api/v1}
+    extra_hosts:
+      - host.docker.internal:host-gateway
     ports:
       - 127.0.0.1:${HTTP_PORT:-8091}:${HTTP_PORT:-8091}
     depends_on:
