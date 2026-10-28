@@ -17,14 +17,22 @@ export class Application {
 
   constructor(config: AppConfig, logger: Logger) {
     this.repository = new PostgresEventRepository(config.DATABASE_URL, config.DATABASE_SSL, logger);
-    const contentClient = new BotCrmContentClient(config.BOTCRM_URL, config.BOTCRM_CONTENT_TOKEN, logger);
+    const contentClient = new BotCrmContentClient(
+      config.BOTCRM_URL,
+      config.BOTCRM_CONTENT_TOKEN,
+      logger,
+    );
     const instagram = new InstagramClient(
       config.META_GRAPH_VERSION,
       config.INSTAGRAM_ACCOUNT_ID,
       config.INSTAGRAM_ACCESS_TOKEN,
       logger,
     );
-    const content = new ContentService(contentClient, config.CONTENT_CACHE_TTL_SECONDS * 1_000, logger);
+    const content = new ContentService(
+      contentClient,
+      config.CONTENT_CACHE_TTL_SECONDS * 1_000,
+      logger,
+    );
     this.eventWorker = new EventWorker(
       this.repository,
       content,

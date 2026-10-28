@@ -103,8 +103,15 @@ export class BotCrmContentClient {
 
   async findQueuedMedia(limit: number): Promise<MediaAsset[]> {
     const query = new URLSearchParams({ limit: String(limit) });
-    const items = await this.request<RuntimeMedia[]>(`bot-content/media/queued?${query.toString()}`);
-    return items.map((item) => ({ id: item.id, name: item.name, kind: item.kind, yandexPath: item.yandex_path }));
+    const items = await this.request<RuntimeMedia[]>(
+      `bot-content/media/queued?${query.toString()}`,
+    );
+    return items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      kind: item.kind,
+      yandexPath: item.yandex_path,
+    }));
   }
 
   async markMediaProcessing(id: number): Promise<void> {
@@ -124,7 +131,10 @@ export class BotCrmContentClient {
   }
 
   private async updateMedia(id: number, changes: Record<string, unknown>): Promise<void> {
-    await this.request(`bot-content/media/${id}`, { method: 'PATCH', body: JSON.stringify(changes) });
+    await this.request(`bot-content/media/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(changes),
+    });
   }
 
   private async request<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {

@@ -52,7 +52,10 @@ export class ContentService {
       return this.cache;
     } catch (error) {
       if (this.cache) {
-        this.logger.warn({ err: error }, 'BotCRM content API unavailable; using stale content cache');
+        this.logger.warn(
+          { err: error },
+          'BotCRM content API unavailable; using stale content cache',
+        );
         return this.cache;
       }
       throw error;
