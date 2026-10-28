@@ -11,21 +11,15 @@ npm test
 npm run build
 ```
 
-## 2. CMS
+## 2. BotCRM
 
-Сначала администратор применяет обновлённый bootstrap из `bot-platform-infra` к тестовой
-CMS и создаёт пространство:
+Сначала запустите BotCRM, подключите Instagram-бота и откройте раздел **Автоответы**.
+Администратор создаёт персональный токен кнопкой **Токен для бота**. Добавьте его в `.env`:
 
-```shell
-BOT_KEY=instagram-direct-bot \
-BOT_NAME='Instagram Direct Bot' \
-BOT_PLATFORM=instagram \
-DIRECTUS_URL=https://ваша-cms.example \
-DIRECTUS_TOKEN=... \
-node scripts/create-bot.mjs
+```dotenv
+BOTCRM_URL=http://localhost:4100/api/v1
+BOTCRM_CONTENT_TOKEN=bcr_...
 ```
-
-На production-сервере эти команды пока выполнять не нужно.
 
 ## 3. Переменные
 
@@ -61,4 +55,4 @@ curl http://127.0.0.1:8091/health
 - повтор одного webhook не создаёт второй ответ;
 - временная ошибка Meta уходит на повторную попытку;
 - медиа проходит `queued → processing → ready`;
-- контент другого `bot_id` не выдаётся.
+- токен одного бота не открывает контент другого бота.
