@@ -1,6 +1,6 @@
 import type { Logger } from '../config/logger.js';
 import type { InstagramClient } from '../instagram/client.js';
-import type { DirectusClient } from './directus-client.js';
+import type { BotCrmContentClient } from './botcrm-content-client.js';
 import type { YandexDiskClient } from './yandex-disk-client.js';
 
 export class MediaWorker {
@@ -8,7 +8,7 @@ export class MediaWorker {
   private running = false;
 
   constructor(
-    private readonly directus: DirectusClient,
+    private readonly contentClient: BotCrmContentClient,
     private readonly yandexDisk: YandexDiskClient,
     private readonly instagram: InstagramClient,
     private readonly batchSize: number,
@@ -32,19 +32,19 @@ export class MediaWorker {
     if (this.running) return;
     this.running = true;
     try {
-      const assets = await this.directus.findQueuedMedia(this.batchSize);
+      const assets = await this.contentClient.findQueuedMedia(this.batchSize);
       for (const asset of assets) {
         try {
           if (asset.kind === 'document') {
             throw new Error('Instagram Direct does not support document attachments');
           }
-          await this.directus.markMediaProcessing(asset.id);
+          await this.contentClient.markMediaProcessing(asset.id);
           const downloadUrl = await this.yandexDisk.getDownloadUrl(asset.yandexPath);
           const reference = await this.instagram.uploadReusableMedia(asset.kind, downloadUrl);
-          await this.directus.markMediaReady(asset.id, reference);
+          await this.contentClient.markMediaReady(asset.id, reference);
           this.logger.info({ mediaId: asset.id, kind: asset.kind }, 'Media prepared');
         } catch (error) {
-          await this.directus.markMediaError(asset.id, error).catch((markError: unknown) => {
+          await this.contentClient.markMediaError(asset.id, error).catch((markError: unknown) => {
             this.logger.error(
               { err: markError, mediaId: asset.id },
               'Failed to persist media error',

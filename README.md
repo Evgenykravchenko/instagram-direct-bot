@@ -1,7 +1,7 @@
 # Instagram Direct Bot
 
 Бот для автоматической выдачи текста, фотографий, видео, аудио и кнопок в Instagram
-Direct по ключевым словам. Контент меняется в общей Directus CMS без правок кода.
+Direct по ключевым словам. Контент меняется в разделе **Автоответы** BotCRM без правок кода.
 
 Проект следует тем же правилам, что VK- и Telegram-боты платформы: отдельный адаптер
 канала, единая CMS, исходники на Яндекс Диске, Docker-образ для `linux/arm64`,
@@ -12,9 +12,9 @@ SemVer-релизы и развёртывание только из опубли
 ```text
 Instagram → проверенный webhook → PostgreSQL-очередь → поиск ключевой фразы
                                                        ↓
-                 Instagram ← Meta Send API ← ответ из Directus
+                 Instagram ← Meta Send API ← ответ из BotCRM
 
-Яндекс Диск → media worker → Meta Attachment Upload → attachment_id в Directus
+Яндекс Диск → media worker → Meta Attachment Upload → attachment_id в BotCRM
 ```
 
 Webhook подтверждается только после записи события в PostgreSQL. Повторная доставка от
@@ -35,7 +35,7 @@ Meta безопасна: идентификатор события уникал�
 
 ## Быстрый локальный запуск
 
-Понадобятся Node.js 22+, Docker и доступ к уже запущенной Directus CMS.
+Понадобятся Node.js 22+, Docker, запущенный BotCRM и персональный токен контента этого бота.
 
 ```shell
 cp .env.example .env

@@ -16,12 +16,8 @@ const schema = z.object({
     .string()
     .regex(/^v\d+\.\d+$/)
     .default('v23.0'),
-  CONTENT_BOT_KEY: z
-    .string()
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-    .default('instagram-direct-bot'),
-  DIRECTUS_URL: z.string().url().default('http://localhost:8055'),
-  DIRECTUS_TOKEN: z.string().min(20),
+  BOTCRM_URL: z.string().url().default('http://localhost:4100/api/v1'),
+  BOTCRM_CONTENT_TOKEN: z.string().min(40),
   CONTENT_CACHE_TTL_SECONDS: z.coerce.number().int().min(5).max(3600).default(60),
   YANDEX_DISK_TOKEN: z.string().min(20),
   MEDIA_POLL_INTERVAL_SECONDS: z.coerce.number().int().min(5).max(3600).default(20),

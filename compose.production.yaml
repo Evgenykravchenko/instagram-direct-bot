@@ -12,9 +12,8 @@ services:
       INSTAGRAM_APP_SECRET: ${INSTAGRAM_APP_SECRET:?INSTAGRAM_APP_SECRET is required}
       INSTAGRAM_VERIFY_TOKEN: ${INSTAGRAM_VERIFY_TOKEN:?INSTAGRAM_VERIFY_TOKEN is required}
       META_GRAPH_VERSION: ${META_GRAPH_VERSION:-v23.0}
-      CONTENT_BOT_KEY: ${CONTENT_BOT_KEY:-instagram-direct-bot}
-      DIRECTUS_URL: ${DIRECTUS_URL:-http://directus:8055}
-      DIRECTUS_TOKEN: ${DIRECTUS_TOKEN:?DIRECTUS_TOKEN is required}
+      BOTCRM_URL: ${BOTCRM_URL:-http://api:4100/api/v1}
+      BOTCRM_CONTENT_TOKEN: ${BOTCRM_CONTENT_TOKEN:?BOTCRM_CONTENT_TOKEN is required}
       CONTENT_CACHE_TTL_SECONDS: ${CONTENT_CACHE_TTL_SECONDS:-60}
       YANDEX_DISK_TOKEN: ${YANDEX_DISK_TOKEN:?YANDEX_DISK_TOKEN is required}
       MEDIA_POLL_INTERVAL_SECONDS: ${MEDIA_POLL_INTERVAL_SECONDS:-20}
@@ -39,5 +38,5 @@ networks:
   egress:
     driver: bridge
   platform:
-    name: bot_platform_backend
+    name: botcrm_backend
     external: true

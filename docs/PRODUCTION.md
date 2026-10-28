@@ -4,14 +4,14 @@
 
 ## Общая платформа
 
-Бот подключается к существующим `directus`, PostgreSQL и сети
-`bot_platform_backend`. Отдельный Directus, Redis или публичная база ему не нужны.
+Бот подключается к API BotCRM и сети `botcrm_backend`. Адрес и административный токен
+внутреннего Directus ему не выдаются.
 Для очереди webhook создаётся отдельная база или отдельный пользователь и схема в общей
-PostgreSQL-инфраструктуре — данные приложения не смешиваются с таблицами Directus.
+PostgreSQL-инфраструктуре — данные приложения не смешиваются с таблицами BotCRM.
 
 ## До первого деплоя
 
-1. Применить additive bootstrap CMS и создать `instagram-direct-bot`.
+1. Подключить бота в BotCRM и создать для него `BOTCRM_CONTENT_TOKEN`.
 2. Создать PostgreSQL database/user для очереди Instagram.
 3. Положить env в `/etc/bot-platform/bots/instagram-direct-bot.env` с правами `600`.
 4. Создать GitHub repository и включить protection для `main`.
